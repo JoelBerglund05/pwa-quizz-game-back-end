@@ -56,16 +56,4 @@ class AuthController extends Controller
 
         return response($response, 201);
     }
-
-
-    public function test(Request $request) {
-        $fields = ["email" => "joel@gmail.com"];
-        // Check email
-        $user = User::where('email', $fields['email'])->first();
-
-        return response()->json([
-            'user'=> $user,
-            "fields" => $fields
-        ],200);
-    }
 }
