@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create("all_active_games", function (Blueprint $table) {
+        Schema::create("active_games", function (Blueprint $table) {
             $table->id();
             $table->timestamps();
             $table->integer("user_id_1")->nullable(false);
             $table->integer("user_id_2")->nullable(true);
+            $table->string("user_name_1")->nullable(false);
+            $table->string("user_name_2")->nullable(true);
             $table->integer("user_points_1")->nullable(false);
             $table->integer("user_points_2")->nullable(false);
             $table->integer("user_turn")->nullable(false);
@@ -23,6 +25,9 @@ return new class extends Migration
             $table->string("question_2")->nullable(true);
             $table->string("question_3")->nullable(true);
             $table->string("category")->nullable(true);
+            $table->integer("rounds")->nullable(false);
+            $table->boolean("user_1_has_answerd_question")->nullable(true);
+            $table->boolean("user_2_has_answerd_question")->nullable(true);
         });
     }
 

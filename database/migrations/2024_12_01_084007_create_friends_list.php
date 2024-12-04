@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('friends_list', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('email1');
-            $table->string('email2');
+            $table->string('email_1');
+            $table->string('email_2');
+            $table->string('name_1');
+            $table->string('name_2');
         });
     }
 
