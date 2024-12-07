@@ -9,6 +9,11 @@ use Illuminate\Validation\Rule;
 class AuthController extends Controller
 {
     public function register(Request $request) {
+
+        if (!$request->isJson()) {
+            return response()->json(['error' => 'Invalid request'], 400);
+        }
+
         $fields = $request->validate([
             'name' => 'required|string',
             'email' => 'required|string|unique:users,email',
