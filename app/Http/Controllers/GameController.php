@@ -58,6 +58,50 @@ class GameController extends Controller
         ], 200);
     }
 
+    public function updateActiveGame(Request $request): JsonResponse {
+        $user = $request->user();
+        $answers = $request->answers;
+        $game = ActiveGames::where("id", $request["id"])->where(function ($query) use ($user){ $query->where("user_id_1", $user->id)->orWhere("user_id_2", $user->id); })->first();
+
+        if(!$game){
+            return response()->json([
+                "message"=> "No game Found!",
+            ], 404);
+        } else if ($game->user_turn != $user->id){
+            return response()->json([
+                "message" => "Not your turn!"
+            ], 405);
+        }
+
+        $questionsGiven = [$game->question_1, $game->question_2, $game->question_3];
+        $pointsGiven = 0;
+
+        for($i = 0; $i < count($questionsGiven); $i++){
+            $question = Questions::where("question", $questionsGiven[$i])->first();
+
+            if($question->answer1 == $answers[$i]){
+                $pointsGiven++;
+            }
+        }
+
+        if ($user->id == $game->user_id_1){
+            $oponentId = $game->user_id_2;
+        } else {
+            $oponentId = $game->user_id_1;
+        }
+
+
+        if($user->name == $game->user_name_1){
+            $game->update(['user_turn' => $oponentId, "user_points_1", $game->user_points_1 + $pointsGiven]);
+        } else {
+            $game->update(['user_turn' => $oponentId, "user_points_2", $game->user_points_2 + $pointsGiven]);
+        }
+
+        return response()->json([
+            "points_added" => $pointsGiven,
+        ], 200);
+    }
+
     public function createGame(Request $request):JsonResponse{
         $user = $request->user();
 
@@ -83,7 +127,16 @@ class GameController extends Controller
 
     public function getAllMyActiveGames(Request $request){
         $user = $request->user();
-        $userGames = ActiveGames::select('id', 'user_name_1', 'user_name_2', 'user_points_1', 'user_points_2', 'user_turn')->where("user_id_1", '=',$user->id)->orWhere("user_id_2",'=', $user->id)->get();
+        $userGames = ActiveGames::select('id', 'user_name_1', 'user_name_2', 'user_points_1', 'user_points_2', 'user_turn', 'question_1', 'question_2', 'question_3')->where("user_id_1", '=',$user->id)->orWhere("user_id_2",'=', $user->id)->get();
+
+        if($user->id == $userGames[0]->user_turn){
+            $userGames[0]->user_turn = $user->name;
+        } else if ($user->name == $userGames[0]->user_name_1){
+            $userGames[0]->user_turn = $userGames[0]->user_name_2;
+
+        } else {
+            $userGames[0]->user_turn = $userGames[0]->user_name_1;
+        }
 
         if(!$userGames){
             return response()->json([

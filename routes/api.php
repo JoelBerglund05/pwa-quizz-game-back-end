@@ -23,6 +23,7 @@ Route::group(["middleware"=> ["auth:sanctum"]], function () {
 
     Route::post("/create-game", [GameController::class,"createGame"]);
     Route::post("/create-game-friend", [GameController::class,"createGameWithFriend"]);
+    Route::post("/set-points", [GameController::class,"updateActiveGame"]);
 
     Route::get("/my-friends", [FriendsController::class,"getFriends"]);
     Route::post("/add-friend", [FriendsController::class,"addFriend"]);
