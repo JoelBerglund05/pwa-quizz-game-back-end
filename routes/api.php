@@ -12,19 +12,6 @@ use App\Http\Controllers\GameController;
     return $request->user();
     });*/
 
+Route::get("/question", [GameController::class, "getQuestion"]);
+Route::post("/new-question", [GameController::class,"setQuestion"]);
 
-
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
-
-Route::group(["middleware"=> ["auth:sanctum"]], function () {
-    Route::get("/question", [GameController::class, "getQuestion"]);
-    Route::get("/my-games", [GameController::class,"getAllMyActiveGames"]);
-
-    Route::post("/create-game", [GameController::class,"createGame"]);
-    Route::post("/create-game-friend", [GameController::class,"createGameWithFriend"]);
-    Route::post("/set-points", [GameController::class,"updateActiveGame"]);
-
-    Route::get("/my-friends", [FriendsController::class,"getFriends"]);
-    Route::post("/add-friend", [FriendsController::class,"addFriend"]);
-});
