@@ -16,6 +16,7 @@ use App\Http\Controllers\GameController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/set-question', [GameController::class,'setQuestion']);
 
 Route::group(["middleware"=> ["auth:sanctum"]], function () {
     Route::get("/question", [GameController::class, "getQuestion"]);

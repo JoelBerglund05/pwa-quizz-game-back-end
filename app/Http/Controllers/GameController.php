@@ -36,6 +36,18 @@ class GameController extends Controller
         ];
     }
 
+    public function setQuestion (Request $request){
+        Questions::create([
+            "question" => $request->question,
+            "answer1" => $request->answer1,
+            "answer2" => $request->answer2,
+            "answer3"=> $request->answer3,
+            "answer4"=> $request->answer4,
+            "category" => $request->category
+        ]);
+        return response()->json(["game"=> "Created!"], 200);
+    }
+
     public function getQuestion(Request $request):JsonResponse {
         $request->validate([
             "id"=> "integer",
@@ -84,21 +96,29 @@ class GameController extends Controller
             }
         }
 
-        if ($user->id == $game->user_id_1){
-            $oponentId = $game->user_id_2;
-        } else {
-            $oponentId = $game->user_id_1;
+        if ($user->id == $game->user_id_1 && $game->user_2_has_answerd_question == true && $game->user_1_has_answerd_question == true){
+            $game->update(['user_turn' => $game->user_id_2, "user_points_1" => $game->user_points_1 + $pointsGiven,"rounds" => $game->rounds + 1 , "user_2_has_answerd_question" => false, "user_1_has_answerd_question" => false]);
+            $sak = ActiveGames::where("id", $request["id"])->where(function ($query) use ($user){ $query->where("user_id_1", $user->id)->orWhere("user_id_2", $user->id); })->first();
+            $sak->update(["user_1_has_answerd_question" => true]);
+        } else if ($user->id == $game->user_id_2 && $game->user_2_has_answerd_question == true && $game->user_1_has_answerd_question == true) {
+            $game->update(['user_turn' => $game->user_id_1, "user_points_2" => $game->user_points_2 + $pointsGiven, "rounds" => $game->rounds + 1 , "user_2_has_answerd_question" => false, "user_1_has_answerd_question" => false]);
+            $sak = ActiveGames::where("id", $request["id"])->where(function ($query) use ($user){ $query->where("user_id_1", $user->id)->orWhere("user_id_2", $user->id); })->first();
+            $sak->update(["user_2_has_answerd_question" => true]);
+        } else if ($user->id == $game->user_id_1){
+            $game->update(['user_turn' => $game->user_id_2, "user_points_1" => $game->user_points_1 + $pointsGiven, ]);
+            $sak = ActiveGames::where("id", $request["id"])->where(function ($query) use ($user){ $query->where("user_id_1", $user->id)->orWhere("user_id_2", $user->id); })->first();
+            $sak->update(["user_1_has_answerd_question" => true]);
+        } else if ($user->id == $game->user_id_2) {
+            $game->update(['user_turn' => $game->user_id_1, "user_points_2" => $game->user_points_2 + $pointsGiven, "user_2_has_answerd_question" => true]);
+            $sak = ActiveGames::where("id", $request["id"])->where(function ($query) use ($user){ $query->where("user_id_1", $user->id)->orWhere("user_id_2", $user->id); })->first();
+            $sak->update(["user_2_has_answerd_question" => true]);
         }
 
-
-        if($user->name == $game->user_name_1){
-            $game->update(['user_turn' => $oponentId, "user_points_1", $game->user_points_1 + $pointsGiven]);
-        } else {
-            $game->update(['user_turn' => $oponentId, "user_points_2", $game->user_points_2 + $pointsGiven]);
-        }
+        $sendGame = ActiveGames::select("user_name_1", "user_name_2", "user_points_1", "user_points_2", "user_2_has_answerd_question", "user_1_has_answerd_question")->where("id", $game->id)->first();
 
         return response()->json([
             "points_added" => $pointsGiven,
+            "game"=> $sendGame
         ], 200);
     }
 
