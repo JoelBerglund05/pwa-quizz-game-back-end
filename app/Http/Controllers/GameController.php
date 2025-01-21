@@ -36,7 +36,7 @@ class GameController extends Controller
         ];
     }
 
-    public function setQuestion (Request $request){
+    public function setQuestion (Request $request):JsonResponse {
         Questions::create([
             "question" => $request->question,
             "answer1" => $request->answer1,
@@ -148,6 +148,12 @@ class GameController extends Controller
     public function getAllMyActiveGames(Request $request){
         $user = $request->user();
         $userGames = ActiveGames::select('id', 'user_name_1', 'user_name_2', 'user_points_1', 'user_points_2', 'user_turn', 'question_1', 'question_2', 'question_3')->where("user_id_1", '=',$user->id)->orWhere("user_id_2",'=', $user->id)->get();
+
+        if(count($userGames) ==  0){
+            return response()->json([
+                "message" => "No game found"
+            ], 404);
+        }
 
         if($user->id == $userGames[0]->user_turn){
             $userGames[0]->user_turn = $user->name;
