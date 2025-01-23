@@ -51,7 +51,21 @@ class GameController extends Controller
             ], 404);
         }
 
-        ActiveGames::where("id", $request["id"])->where(function ($query) use ($user){ $query->where("user_id_1", $user->id)->orWhere("user_id_2", $user->id); })->update(["question_1" => $questionsData[0]["question"], "question_2" => $questionsData[1]["question"], "question_3" => $questionsData[2]["question"]]);
+        $game = ActiveGames::where("id", $request["id"])->where(function ($query) use ($user){
+            $query->where("user_id_1", $user->id)->orWhere("user_id_2", $user->id);
+        })->first();
+
+        if(!$game){
+            return response()->json([
+                "message"=> "No game found.",
+            ],405);
+        } else if ($game->user_1_has_answerd_question == False && $game->user_2_has_answerd_question == False){
+            return response()->json([
+                "message" => "Answer the pending questions first"
+            ], 405);
+        }
+
+        $game->update(["question_1" => $questionsData[0]["question"], "question_2" => $questionsData[1]["question"], "question_3" => $questionsData[2]["question"]]);
 
         return response()->json([
             "questions" => $questionsData,
@@ -61,7 +75,9 @@ class GameController extends Controller
     public function updateActiveGame(Request $request): JsonResponse {
         $user = $request->user();
         $answers = $request->answers;
-        $game = ActiveGames::where("id", $request["id"])->where(function ($query) use ($user){ $query->where("user_id_1", $user->id)->orWhere("user_id_2", $user->id); })->first();
+        $game = ActiveGames::where("id", $request["id"])->where(function ($query) use ($user){
+            $query->where("user_id_1", $user->id)->orWhere("user_id_2", $user->id);
+        })->first();
 
         if(!$game){
             return response()->json([
@@ -90,15 +106,15 @@ class GameController extends Controller
             $oponentId = $game->user_id_1;
         }
 
-
-        if($user->name == $game->user_name_1){
-            $game->update(['user_turn' => $oponentId, "user_points_1", $game->user_points_1 + $pointsGiven]);
+        if($user->id == $game->user_id_1){
+            $game->update(["user_1_has_answerd_question" => true, 'user_turn' => $oponentId, "user_points_1" => $game->user_points_1 + $pointsGiven]);
         } else {
-            $game->update(['user_turn' => $oponentId, "user_points_2", $game->user_points_2 + $pointsGiven]);
+            $game->update(["user_2_has_answerd_question" => true, 'user_turn' => $oponentId, "user_points_2" => $game->user_points_2 + $pointsGiven]);
         }
 
         return response()->json([
             "points_added" => $pointsGiven,
+            "game" => $game
         ], 200);
     }
 

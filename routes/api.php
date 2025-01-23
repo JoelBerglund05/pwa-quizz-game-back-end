@@ -18,6 +18,12 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::group(["middleware"=> ["auth:sanctum"]], function () {
+
+    /*
+    1. /question fixa så att du inte kan kalla utan ett aktivt spel (Max en gång).
+    2.
+    */
+
     Route::get("/question", [GameController::class, "getQuestion"]);
     Route::get("/my-games", [GameController::class,"getAllMyActiveGames"]);
 
