@@ -14,5 +14,7 @@ class ActiveGames extends Model
         'user_turn',
         'user_points_1',
         'user_points_2',
-        'rounds'
+        'rounds',
+        'user_1_has_answered_question',
+        'user_2_has_answered_question'
     ];}

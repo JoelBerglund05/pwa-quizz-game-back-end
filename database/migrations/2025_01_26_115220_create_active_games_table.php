@@ -26,8 +26,8 @@ return new class extends Migration
             $table->string("question_3")->nullable(true);
             $table->string("category")->nullable(true);
             $table->integer("rounds")->nullable(false);
-            $table->boolean("user_1_has_answerd_question")->nullable(true);
-            $table->boolean("user_2_has_answerd_question")->nullable(true);
+            $table->boolean("user_1_has_answered_question")->nullable(true);
+            $table->boolean("user_2_has_answered_question")->nullable(true);
         });
     }
 
