@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Questions;
+use App\Models\Qusetions;
 use App\Models\User;
 use App\Models\ActiveGames;
 use App\Models\FriendsList;
@@ -43,7 +43,7 @@ class GameController extends Controller
 
         $user = $request->user();
 
-        $questionsData = Questions::inRandomOrder()->limit(3)->get();
+        $questionsData = Qusetions::inRandomOrder()->limit(3)->get();
 
         if($questionsData->count() < 3){
             return response()->json([
@@ -77,7 +77,7 @@ class GameController extends Controller
         $pointsGiven = 0;
 
         for($i = 0; $i < count($questionsGiven); $i++){
-            $question = Questions::where("question", $questionsGiven[$i])->first();
+            $question = Qusetions::where("question", $questionsGiven[$i])->first();
 
             if($question->answer1 == $answers[$i]){
                 $pointsGiven++;

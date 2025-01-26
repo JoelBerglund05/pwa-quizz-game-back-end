@@ -4,13 +4,14 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use GuzzleHttp\Exception\ClientException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 
 class AuthController extends Controller
 {
-    public function redirectToProvider($provider){
+    public function redirectToProvider($provider): JsonResponse{
         $validated = $this->validatedProvider($provider);
         if(!is_null($validated)){
             return $validated;
@@ -19,7 +20,7 @@ class AuthController extends Controller
         return Socialite::driver($provider)->stateless()->redirect();
     }
 
-    public function handleProviderCallback($provider){
+    public function handleProviderCallback($provider):JsonResponse{
         $validated = $this->validatedProvider($provider);
         if(!is_null($validated)){
             return $validated;
@@ -56,9 +57,10 @@ class AuthController extends Controller
         return response()->json(['user' => $userCreated,'Access-Token' => $token], 200);
     }
 
-    protected function validatedProvider($provider){
+    protected function validatedProvider($provider):JsonResponse|null{
         if(!in_array($provider, ['google'])){
             return response()->json(['error' => 'Invalid provider.'], 422);
         }
+        return null;
     }
 }
