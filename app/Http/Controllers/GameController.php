@@ -129,6 +129,14 @@ class GameController extends Controller
         $user = $request->user();
         $userGames = ActiveGames::select('id', 'user_name_1', 'user_name_2', 'user_points_1', 'user_points_2', 'user_turn', 'question_1', 'question_2', 'question_3')->where("user_id_1", '=',$user->id)->orWhere("user_id_2",'=', $user->id)->get();
 
+        if (is_null($userGames)){
+            return response()->json(["message" => "No active games found!"], 404);
+        } else if (count($userGames) == 0){
+            return response()->json(["message" => "No active games found!"], 404);
+        } else if(!$userGames){
+            return response()->json(["message" => "No active games found!"], 404);
+        }
+
         if($user->id == $userGames[0]->user_turn){
             $userGames[0]->user_turn = $user->name;
         } else if ($user->name == $userGames[0]->user_name_1){
@@ -138,11 +146,7 @@ class GameController extends Controller
             $userGames[0]->user_turn = $userGames[0]->user_name_1;
         }
 
-        if(!$userGames){
-            return response()->json([
-                "message" => "No games"
-            ], 200);
-        }
+
 
         return response()->json($userGames,200);
 
