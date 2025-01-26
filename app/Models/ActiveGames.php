@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class ActiveGames extends Model
 {
-    //
     protected $fillable = [
         'user_id_1',
         'user_id_2',
@@ -16,6 +15,4 @@ class ActiveGames extends Model
         'user_points_1',
         'user_points_2',
         'rounds'
-    ];
-
-}
+    ];}

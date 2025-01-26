@@ -4,9 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Questions extends Model
+class Qusetions extends Model
 {
-    //
     protected $fillable = [
         'question',
         'answer1',

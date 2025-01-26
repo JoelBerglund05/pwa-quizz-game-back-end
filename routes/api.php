@@ -1,21 +1,16 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\FriendsController;
 use App\Http\Controllers\GameController;
 
-/*Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
-    return $request->user();
-    });*/
 
 
+Route::get("/auth/{provider}/redirect", [AuthController::class, "redirectToProvider"]);
+Route::get("/auth/{provider}/callback", [AuthController::class, "handleProviderCallback"]);
 
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+
 
 Route::group(["middleware"=> ["auth:sanctum"]], function () {
     Route::get("/question", [GameController::class, "getQuestion"]);
