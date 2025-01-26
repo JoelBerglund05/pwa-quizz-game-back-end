@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Questions extends Model
 {
     //
+
+    protected $table = 'quiz';
     protected $fillable = [
         'question',
         'answer1',
