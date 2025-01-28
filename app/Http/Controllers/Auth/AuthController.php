@@ -11,7 +11,7 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
-    public function redirectToProvider($provider): JsonResponse{
+    public function redirectToProvider($provider){
         $validated = $this->validatedProvider($provider);
         if(!is_null($validated)){
             return $validated;
