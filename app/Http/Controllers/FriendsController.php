@@ -28,7 +28,6 @@ class FriendsController extends Controller
         if(!$friendProfile) {
             return response()->json([
                 "message" => "Friend profile not found",
-                "friend" => $friend
             ], 404);
         }
 
