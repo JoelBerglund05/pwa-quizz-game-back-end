@@ -8,6 +8,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
+
 
 class AuthController extends Controller
 {
@@ -52,9 +55,9 @@ class AuthController extends Controller
             ]
         );
 
-        $token = $userCreated->createToken('user-token')->plainTextToken;
+        $token = JWTAuth::fromUser($userCreated);
 
-        return response()->json(['user' => $userCreated,'Access-Token' => $token], 200);
+        return response()->json(compact('user','token'), 201);
     }
 
     protected function validatedProvider($provider):JsonResponse|null{

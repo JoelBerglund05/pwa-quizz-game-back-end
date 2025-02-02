@@ -4,11 +4,12 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\hasOne;
+
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use App\Models\Provider;
+use App\Models\Profiles;
 
 class User extends Authenticatable
 {
@@ -20,10 +21,15 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+
+    protected $table = 'auth.users';
+
+    protected $primaryKey = 'uid';
+
     protected $fillable = [
         'name',
         'email',
-        'password',
+        'uid'
     ];
 
     /**
@@ -47,9 +53,6 @@ class User extends Authenticatable
      * @return array<string, string>
      */
 
-    public function providers(): HasMany {
-        return $this->hasMany(Provider::class, 'user_id', 'id');
-    }
     protected function casts(): array
     {
         return [

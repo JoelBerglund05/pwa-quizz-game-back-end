@@ -14,13 +14,13 @@ return new class extends Migration
         Schema::create('active_games', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->integer("user_id_1")->nullable(false);
-            $table->integer("user_id_2")->nullable(true);
+            $table->uuid("user_id_1")->nullable(false);
+            $table->uuid("user_id_2")->nullable(true);
             $table->string("user_name_1")->nullable(false);
             $table->string("user_name_2")->nullable(true);
             $table->integer("user_points_1")->nullable(false);
             $table->integer("user_points_2")->nullable(false);
-            $table->integer("user_turn")->nullable(false);
+            $table->uuid("user_turn")->nullable(false);
             $table->string("question_1")->nullable(true);
             $table->string("question_2")->nullable(true);
             $table->string("question_3")->nullable(true);

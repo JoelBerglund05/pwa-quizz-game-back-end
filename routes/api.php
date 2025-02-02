@@ -1,18 +1,13 @@
 <?php
 
+use App\Http\Middleware\SupabaseMiddleware;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\FriendsController;
 use App\Http\Controllers\GameController;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Request;
 
-
-
-Route::get("/auth/{provider}/redirect", [AuthController::class, "redirectToProvider"]);
-Route::get("/auth/{provider}/callback", [AuthController::class, "handleProviderCallback"]);
-
-
-
-Route::group(["middleware"=> ["auth:sanctum"]], function () {
+Route::middleware(SupabaseMiddleware::class)->group(function () {
     Route::get("/question", [GameController::class, "getQuestion"]);
     Route::get("/my-games", [GameController::class,"getAllMyActiveGames"]);
 

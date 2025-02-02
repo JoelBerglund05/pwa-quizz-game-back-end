@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\FriendsList;
+use App\Models\Profiles;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +13,7 @@ class FriendsController extends Controller
     //
 
     public function addFriend(Request $request){
-        $user = $request->user();
+        $user = ["email" => $request->email, "display_name" => $request->display_name, "id" => $request->id];
 
         $friend = User::where("email", $request->friend_email)->first();
 
@@ -22,11 +23,20 @@ class FriendsController extends Controller
             ], 404);
         }
 
+        $friendProfile = Profiles::where("user_id", $friend->id)->first();
+
+        if(!$friendProfile) {
+            return response()->json([
+                "message" => "Friend profile not found",
+                "friend" => $friend
+            ], 404);
+        }
+
         $friendShip = FriendsList::create([
-            "email_1" => $user->email,
+            "email_1" => $user["email"],
             "email_2" => $friend->email,
-            "name_1" => $user->name,
-            "name_2" => $friend->name
+            "name_1" => $user["display_name"],
+            "name_2" => $friendProfile->display_name
         ]);
 
         return response()->json([
@@ -36,9 +46,12 @@ class FriendsController extends Controller
     }
 
     public function getFriends(Request $request){
-        $user = $request->user();
+        $user = ["email" => $request->email, "display_name" => $request->display_name, "id" => $request->id];
 
-        $usersFriends = FriendsList::select(DB::raw("(CASE WHEN name_1 = '$user->name' THEN name_2 ELSE name_1 END) as name"), DB::raw("(CASE WHEN name_1 = '$user->name' THEN email_2 ELSE email_1 END) as email"))->where("email_1", $user->email)->orWhere("email_2", $user->email)->get();
+        $usersFriends = FriendsList::select(
+            DB::raw("(CASE WHEN name_1 = '{$user["display_name"]}' THEN name_2 ELSE name_1 END) as name"),
+            DB::raw("(CASE WHEN name_1 = '{$user["display_name"]}' THEN email_2 ELSE email_1 END) as email"))
+            ->where("email_1", $user["email"])->orWhere("email_2", $user["email"])->get();
 
         if(!$usersFriends){
             return response()->json([
