@@ -159,7 +159,7 @@ class GameController extends Controller
             }
         }
 
-        return response()->json($userGames,200);
+        return response()->json(["games" => $userGames],200);
     }
 
     public function createGameWithFriend(Request $request){
