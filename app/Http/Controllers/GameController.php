@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use function Sodium\increment;
 
 class GameController extends Controller
 {
@@ -148,6 +149,21 @@ class GameController extends Controller
             return response()->json(["message" => "No active games found!"], 404);
         }
 
+        $questions = [
+            "game1"=>Questions::where('question', $userGames[0]["question_1"])
+                ->orWhere('question', $userGames[0]["question_2"])
+                ->orWhere('question', $userGames[0]["question_3"])
+                ->get(),
+            "game2"=>Questions::where('question', $userGames[1]["question_1"])
+                ->orWhere('question', $userGames[1]["question_2"])
+                ->orWhere('question', $userGames[1]["question_3"])
+                ->get(),
+            "game3"=>Questions::where('question', $userGames[2]["question_1"])
+                ->orWhere('question', $userGames[2]["question_2"])
+                ->orWhere('question', $userGames[2]["question_3"])
+                ->get(),
+        ];
+
         for ($i = 0; $i < count($userGames); $i++){
             if($user["uid"] == $userGames[$i]->user_turn){
                 $userGames[$i]->user_turn = $user["display_name"];
@@ -159,7 +175,9 @@ class GameController extends Controller
             }
         }
 
-        return response()->json(["games" => $userGames],200);
+
+
+        return response()->json(["games" => $userGames, "questions" => $questions],200);
     }
 
     public function createGameWithFriend(Request $request){
