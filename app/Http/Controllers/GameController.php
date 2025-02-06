@@ -72,14 +72,12 @@ class GameController extends Controller
 
         if(!$game){
             return response()->json([
-                "message"=> "No game Found!",
+                "message"=> "No game Found!"
             ], 404);
         } else if ($game->user_turn != $user["uid"]){
             return response()->json([
                 "message" => "Not your turn!"
             ], 405);
-        } else if ($game->user_1_has_answered_question && $game->user_2_has_answered_question){
-            $this->getQuestion($request);
         }
 
         $questionsGiven = [$game->question_1, $game->question_2, $game->question_3];
@@ -104,6 +102,10 @@ class GameController extends Controller
             $game->update(['user_turn' => $oponentId, "user_points_1" => $game->user_points_1 + $pointsGiven, 'user_1_has_answered_question' => true]);
         } else {
             $game->update(['user_turn' => $oponentId, "user_points_2" => $game->user_points_2 + $pointsGiven, 'user_2_has_answered_question' => true]);
+        }
+
+        if ($game->user_1_has_answered_question == true && $game->user_2_has_answered_question == true){
+            $this->getQuestion($request);
         }
 
         return response()->json([
@@ -149,16 +151,15 @@ class GameController extends Controller
             return response()->json(["message" => "No active games found!"], 404);
         }
 
-        $questions = [
-            "game1"=>Questions::where('question', $userGames[0]["question_1"])
+        $questions = [Questions::where('question', $userGames[0]["question_1"])
                 ->orWhere('question', $userGames[0]["question_2"])
                 ->orWhere('question', $userGames[0]["question_3"])
                 ->get(),
-            "game2"=>Questions::where('question', $userGames[1]["question_1"])
+            Questions::where('question', $userGames[1]["question_1"])
                 ->orWhere('question', $userGames[1]["question_2"])
                 ->orWhere('question', $userGames[1]["question_3"])
                 ->get(),
-            "game3"=>Questions::where('question', $userGames[2]["question_1"])
+            Questions::where('question', $userGames[2]["question_1"])
                 ->orWhere('question', $userGames[2]["question_2"])
                 ->orWhere('question', $userGames[2]["question_3"])
                 ->get(),

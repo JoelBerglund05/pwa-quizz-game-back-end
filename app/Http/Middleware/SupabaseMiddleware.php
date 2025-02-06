@@ -48,7 +48,6 @@ class SupabaseMiddleware
         $request->merge($userData);
 
 
-
         return $next($request);
     }
 }
