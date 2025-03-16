@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Http;
 
+use function PHPSTORM_META\type;
 
 class SupabaseMiddleware
 {
@@ -29,20 +30,7 @@ class SupabaseMiddleware
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-
-
-
-            $profile = Profiles::where("user_id", $response["id"])->first();
-
-            if (is_null($profile)) {
-                $profile = Profiles::create([
-                    "display_name" => "temp",
-                    "user_id" => $response["id"]
-                ]);
-            }
-
-
-        $userData = ["uid" => $response["id"], "email" =>  $response["email"], "display_name" => $profile["display_name"]];
+        $userData = ["uid" => $response["id"], "email" =>  $response["email"], "display_name" => $response["user_metadata"]["display_name"]];
 
 
         $request->merge($userData);

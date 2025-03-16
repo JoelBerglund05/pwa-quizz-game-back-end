@@ -23,19 +23,13 @@ class FriendsController extends Controller
             ], 404);
         }
 
-        $friendProfile = Profiles::where("user_id", $friend->id)->first();
-
-        if(!$friendProfile) {
-            return response()->json([
-                "message" => "Friend profile not found",
-            ], 404);
-        }
+        $friendMetaData = json_decode($friend->raw_user_meta_data);
 
         $friendShip = FriendsList::create([
             "email_1" => $user["email"],
             "email_2" => $friend->email,
             "name_1" => $user["display_name"],
-            "name_2" => $friendProfile->display_name
+            "name_2" => $friendMetaData->display_name
         ]);
 
         return response()->json([

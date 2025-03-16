@@ -4,7 +4,6 @@ use App\Http\Middleware\SupabaseMiddleware;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FriendsController;
 use App\Http\Controllers\GameController;
-use App\Http\Controllers\UserSettingsController;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 
@@ -19,5 +18,4 @@ Route::middleware(SupabaseMiddleware::class)->group(function () {
     Route::get("/my-friends", [FriendsController::class,"getFriends"]);
     Route::post("/add-friend", [FriendsController::class,"addFriend"]);
 
-    Route::post("/add-display-name", [UserSettingsController::class,"addDisplayName"]);
 });

@@ -38,13 +38,7 @@ class GameController extends Controller
         ];
     }
 
-    public function getQuestion(Request $request):JsonResponse {
-        $request->validate([
-            "id"=> "integer",
-        ]);
-
-        $user = ["email" => $request->email, "display_name" => $request->display_name, "uid" => $request->uid];
-
+    private function getQuestion($id):JsonResponse {
         $questionsData = Questions::inRandomOrder()->limit(3)->get();
 
         if($questionsData->count() < 3){
@@ -53,7 +47,7 @@ class GameController extends Controller
             ], 404);
         }
 
-        $updateResult = ActiveGames::where("id", $request["id"])->where(function ($query) use ($user){ $query->where("user_id_1", $user["uid"])->orWhere("user_id_2", $user["uid"]); })->update(["question_1" => $questionsData[0]["question"], "question_2" => $questionsData[1]["question"], "question_3" => $questionsData[2]["question"], "user_1_has_answered_question" => false, "user_2_has_answered_question" => false]);
+        $updateResult = ActiveGames::where("id", $id)->update(["question_1" => $questionsData[0]["question"], "question_2" => $questionsData[1]["question"], "question_3" => $questionsData[2]["question"], "user_1_has_answered_question" => false, "user_2_has_answered_question" => false]);
 
         return response()->json([
             "questions" => $questionsData,
@@ -105,7 +99,7 @@ class GameController extends Controller
         }
 
         if ($game->user_1_has_answered_question == true && $game->user_2_has_answered_question == true){
-            $this->getQuestion($request);
+            $this->getQuestion($request->id);
         }
 
         return response()->json([
@@ -151,21 +145,18 @@ class GameController extends Controller
             return response()->json(["message" => "No active games found!"], 404);
         }
 
-        $questions = [Questions::where('question', $userGames[0]["question_1"])
-                ->orWhere('question', $userGames[0]["question_2"])
-                ->orWhere('question', $userGames[0]["question_3"])
-                ->get(),
-            Questions::where('question', $userGames[1]["question_1"])
-                ->orWhere('question', $userGames[1]["question_2"])
-                ->orWhere('question', $userGames[1]["question_3"])
-                ->get(),
-            Questions::where('question', $userGames[2]["question_1"])
-                ->orWhere('question', $userGames[2]["question_2"])
-                ->orWhere('question', $userGames[2]["question_3"])
-                ->get(),
-        ];
+        $questions = [];
+
 
         for ($i = 0; $i < count($userGames); $i++){
+            if (is_null($userGames[$i]["question_1"])){
+                $this->getQuestion($userGames[$i]->id);
+            }
+            array_push($questions,
+        [Questions::where('question', $userGames[$i]["question_1"])->get(),
+                Questions::where('question', $userGames[$i]["question_2"])->get(),
+                Questions::where('question', $userGames[$i]["question_3"])->get()]
+            );
             if($user["uid"] == $userGames[$i]->user_turn){
                 $userGames[$i]->user_turn = $user["display_name"];
             } else if ($user["display_name"] == $userGames[$i]->user_name_1){
@@ -191,19 +182,13 @@ class GameController extends Controller
             ], 404);
         }
 
-        $friendProfile = Profiles::where("user_id" , $friend->id)->first();
-
-        if (!$friendProfile) {
-            return response()->json([
-                "error" => "No user found with this id"
-            ]);
-        }
+        $friendMetaData = json_decode($friend->raw_user_meta_data);
 
         $createGame = ActiveGames::create([
             "user_id_1" => $user["uid"],
             "user_id_2" => $friend->id,
             "user_name_1" => $user["display_name"],
-            "user_name_2" => $friendProfile->display_name,
+            "user_name_2" => $friendMetaData->display_name,
             "user_turn" => $user["uid"],
             "user_points_1" => 0,
             "user_points_2" => 0,
@@ -213,7 +198,7 @@ class GameController extends Controller
             "game" => [
                 "id" => $createGame->id,
                 "user_name_1" => $user["display_name"],
-                "user_name_2" => $friendProfile->display_name,
+                "user_name_2" => $friendMetaData->display_name,
                 "user_turn" => $user["display_name"],
                 "user_points_1" => 0,
                 "user_points_2" => 0,
